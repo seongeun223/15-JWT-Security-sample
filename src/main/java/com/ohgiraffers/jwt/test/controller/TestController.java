@@ -5,15 +5,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/test")
 public class TestController {
 
-    @GetMapping("/user/test")
+    @GetMapping("/user")
     public String testUser() {
         return "user 권한만 접근 가능한 test success";
     }
 
-    @GetMapping("/admin/test")
+    @GetMapping("/admin")
     public String testAdmin() {
         return "Admin 권한만 접근 가능한 test success";
     }

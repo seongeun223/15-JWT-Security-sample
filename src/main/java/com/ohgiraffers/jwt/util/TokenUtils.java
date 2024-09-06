@@ -114,7 +114,7 @@ public class TokenUtils {
     private static Map<String, Object> createHeader(){
         Map<String, Object> header = new HashMap<>();
 
-        // 토큰ㄴ 타입
+        // 토큰 타입
         header.put("type", "jwt");
         // 토큰에 사용된 알고리즘
         header.put("alg", "HS256");

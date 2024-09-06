@@ -29,6 +29,11 @@ public class AuthService {
     public MemberDTO signup(MemberDTO memberDTO) {
 
         // 중복체크..(선택적)
+        // Email을 사용자를 특정하는데 사용할 거다.
+        // => 이메일은 중복되면 안 된다.
+
+        // 이메일 중복체크
+        // 데이터베이스에서 email로 Member를 조회했을 때 있으면 Exception 처리
 
         // 비밀번호 암호화
         memberDTO.setMemberPass(passwordEncoder.encode(memberDTO.getMemberPass()));

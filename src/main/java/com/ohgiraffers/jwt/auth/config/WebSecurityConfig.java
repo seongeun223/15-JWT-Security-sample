@@ -32,6 +32,11 @@ public class WebSecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
 
+        // 특정 요청에 대해 spring security filter chain을 건너뛰도록 하는 역할
+
+        // WebConfig에 설정한 addResourceHandler는 정적 자원에 대해 요청을 할 수 있게 해주는 역할
+        // webSecurityCustomizer는 특정 요청에 대해 filterChain을 건너뛰도록 설정하는 역할
+
         return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
