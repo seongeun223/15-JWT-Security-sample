@@ -65,31 +65,51 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
+        // 헤더에서 토큰 꺼내기
         String header = request.getHeader(AuthConstants.AUTH_HEADER);
 
+        // 유효한 토큰 확인
         try {
+            // 토큰 꺼냈는데 비어있는지
             if(header != null && !header.equalsIgnoreCase("")){
+
+                // 토큰 분리(Bearer 분리시켜서 토큰만 반환받기)
                 String token = TokenUtils.splitHeader(header);
 
+                // 조건식 안에 들어있는 코드를 통해 토큰을 검증함
+                // 검증 결과가 True(유효한 토큰)이면 이후 처리를 진행한다.
                 if(TokenUtils.isValidToken(token)){
+
+                    // payload에 담긴 (토큰에 담겨있는 정보들)
                     Claims claims = TokenUtils.getClaimsFromToken(token);
 
+                    // 토큰에 담긴 정보로 Member 객체를 만든다.
+                    // 인증과 인가 처리를 할 수 있는 객체
+                    // DTO 외에 추가할 게 있으면 추가하면 된다.
+                    // (security context에 등록된 인증 객체(UserDetail)를 만들기 위해)
                     Member member = Member.builder()
                             .memberId(claims.get("memberName").toString())
                             .memberEmail(claims.get("memberEmail").toString())
                             .role(Role.valueOf(claims.get("memberRole").toString()))
                             .build();
 
+                    // 토큰에 담겨있던 정보로 인증 객체를 만든다.
                     CustomUserDetails userDetails = new CustomUserDetails();
                     userDetails.setMember(member);
 
+                    // 인증된 사용자 토큰
+                    // 만들어진 security 내부에서 사용됨
                     AbstractAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
+                    // authenticationToken에 추가 정보 설정(IP, 세션 정보)
                     authenticationToken.setDetails(new WebAuthenticationDetails(request));
+                    // 인증 객체를 만들어준 이유 : SecurityContextHolder에 등록하기 위해서
 
+                    // SecurityContextHolder에 인증 객체 등록
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
+                    // 다음 필터로 이동하세요.
                     chain.doFilter(request, response);
                 }else{
                     throw new RuntimeException("토큰이 유효하지 않습니다.");
@@ -98,6 +118,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 throw new RuntimeException("토큰이 존재하지 않습니다.");
             }
         }catch (Exception e){
+
+            // Exception 발생 시 Exception 내용을 응답해준다.
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             PrintWriter printWriter = response.getWriter();
@@ -114,8 +136,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      * */
     private JSONObject jsonresponseWrapper(Exception e) {
         String resultMsg = "";
+        // 토큰이 만료되었을 때
+        // 토큰 만료 exception
         if (e instanceof ExpiredJwtException) {
             resultMsg = "Token Expired";
+
+            // 토큰 서명 exception
         } else if (e instanceof SignatureException) {
             resultMsg = "TOKEN SignatureException Login";
         }

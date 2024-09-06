@@ -60,6 +60,7 @@ public class WebSecurityConfig {
                 // 실패 시(failureHandler를 통해) 실패 이유를 담아서 응답한다.
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
+                // header에 token이 담겨져 왔을 경우 인가처리를 해주는 필터
                 .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/signup", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll() // Swagger 관련 리소스와 회원가입 경로 허용
