@@ -40,7 +40,9 @@ dependencies {
     // JWT 라이브러리
     implementation "io.jsonwebtoken:jjwt:0.9.1"
 
+    // spring 버전이 바뀌게 되면서 발생한 호환문제를 해결하기 위해 추가한 라이브러리
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    // json 형태로 응답할 수 있게 해주는 라이브러리
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
 }

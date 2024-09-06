@@ -28,20 +28,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
+/*
+* JWT를 사용해 인가 처리를 담당하는 필터
+*
+* HTTP 요청이 들어올 때 JWT 토큰을 확인하고 유효한 토큰의 경우
+* 사용자 정보를 인증 컨텍스트에 등록하여 해당 요청이 인증된 사용자로서 처리되도록 한다.
+* */
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
 
+    /*
+    * url 요청이 왔을 때 인가(권환)가 필요없는 url
+    * 이 필터에 걸리지 않게 처리
+    * */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         /*
          * 권한이 필요없는 리소스 추출
          * */
         List<String> roleLeessList = Arrays.asList(
-                "/auth/signup",
+                // 권한이 필요없는 url들은 여기에 추가한다.
+                "/auth/signup",             // 회원가입
                 "/swagger-ui/(.*)",        //swagger 설정
                 "/swagger-ui/index.html",  //swagger 설정
                 "/v3/api-docs",              //swagger 설정

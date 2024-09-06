@@ -15,11 +15,11 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 
 
-
+/*
+* 사용자 로그인 실패 시
+* 실패 요청을 커스텀 하기 위한 핸들러
+* */
 public class CustomAuthFailUserHandler implements AuthenticationFailureHandler {
-
-
-
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {

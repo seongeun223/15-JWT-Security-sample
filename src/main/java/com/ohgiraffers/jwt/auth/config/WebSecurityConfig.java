@@ -45,11 +45,21 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                // csrf (Cross-Site-Request-Forgery)
+                // RESTAPI 혹은 JWT 기반 인증에서는 세션을 사용하지 않아서 보호를 하지 않아도 됨.
                 .csrf(AbstractHttpConfigurer::disable)
+                // 어플리케이션의 session 상태를 비저장 모드로 동작하게 함
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 기존 formlogin을 사용하지 않으므로 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)
+                // http 기본 인증 (JWT를 사용할 것이므로) 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
+
+                // 사용자가 입력한 아이디 패스워드를 전달받아 로그인을 직접적으로 수행하는 필터
+                // 인증 시(successHandler를 통해) 토큰을 생성해서 header로 전달하고
+                // 실패 시(failureHandler를 통해) 실패 이유를 담아서 응답한다.
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
                 .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/signup", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll() // Swagger 관련 리소스와 회원가입 경로 허용
@@ -93,19 +103,26 @@ public class WebSecurityConfig {
      * 6. 사용자의 인증 요청을 가로채서 로그인 로직을 수행하는 필터
      * @return CustomAuthenticationFilter
      * */
+
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter(){
 
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
 
+        // /login 으로 post 요청이 들어오면 필터가 동작한다.
         customAuthenticationFilter.setFilterProcessesUrl("/login");
 
+        // 인증 성공 시 동작할 핸들러 설정
         customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthLoginSuccessHandler());
 
+        // 인증 실패 시 동작할 핸들러 설정
         customAuthenticationFilter.setAuthenticationFailureHandler(customAuthFailUserHandler());
 
+        // 필터의 모든 속성 설정을 완료했을 때
+        // 올바르게 설정되어있는지 확인하는 역할의 메소드
         customAuthenticationFilter.afterPropertiesSet();
 
+        // 완성된 CustomAuthenticationFilter를 반환한다.
         return customAuthenticationFilter;
     }
 
