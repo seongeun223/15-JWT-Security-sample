@@ -57,8 +57,30 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/v3/api-docs",              //swagger 설정
                 "/v3/api-docs/(.*)",         //swagger 설정
                 "/swagger-resources",        //swagger 설정
-                "/swagger-resources/(.*)"    //swagger 설정
+                "/swagger-resources/(.*)",    //swagger 설정
+                "/api/v1/test\\w+"
         );
+        // 정규 표현식
+        /*
+        * (.*)
+        * 0개 이상의 임의 문자와 일치하는 패턴
+        * 예시 : /test/(.*)
+        * "/test/user", "/test/admin"
+        *
+        * \\d
+        * - 숫자 하나와 일치하는 패턴 (0~9)
+        * - d+ 하나 이상의 숫자와 일치하는 패턴
+        * - 예시 : /test/\\d+
+        * - "/test/1" "/test/123"
+        *
+        * \\w
+        * - 알파벳 문자, 숫자, 언더바(_) 하나와 일치하는 패턴
+        * - w+ 하나 이상의 알파벳 문자, 숫자, 언더바로 이루어진 문자열과 일치하는 패턴
+        * - 예시 : /test/\\w+
+        * - "/test/user123", "/test/
+        *
+        * /v3/api-docs/test/user
+        * */
 
         if(roleLeessList.stream().anyMatch(uri -> roleLeessList.stream().anyMatch(pattern -> Pattern.matches(pattern, request.getRequestURI())))){
             chain.doFilter(request,response);
